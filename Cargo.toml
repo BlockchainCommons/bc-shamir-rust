@@ -1,0 +1,17 @@
+[package]
+name = "bc-shamir-rust"
+version = "0.1.0"
+edition = "2021"
+description = "Shamir's Secret Sharing (SSS) for Rust."
+authors = ["Blockchain Commons"]
+keywords = ["cryptography"]
+repository = "https://github.com/BlockchainCommons/bc-shamir-rust"
+readme = "README.md"
+categories = ["cryptography"]
+
+[dependencies]
+bc-crypto = { path = "../bc-crypto-rust" }
+
+[dev-dependencies]
+hex-literal = "0.4.1"
+hex = "0.4.3"
