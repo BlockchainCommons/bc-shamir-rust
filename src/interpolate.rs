@@ -107,10 +107,10 @@ pub fn interpolate(
     // The hazmat gf256 implementation needs the y-coordinate data
     // to be in 32-byte blocks
     let mut y = vec![vec![0u8; SHAMIR_MAX_SECRET_SIZE]; n];
-    let mut yv = vec![0u8; SHAMIR_MAX_SECRET_SIZE * n];
+    // let mut yv = vec![0u8; SHAMIR_MAX_SECRET_SIZE * n];
     let mut values = vec![0u8; SHAMIR_MAX_SECRET_SIZE];
 
-    yv[..yl].copy_from_slice(&yij[0]);
+    // yv[..yl].copy_from_slice(&yij[0]);
     for i in 0..n {
         y[i][..yl].copy_from_slice(&yij[i]);
     }
@@ -143,7 +143,7 @@ pub fn interpolate(
     memzero(&mut result_slice);
     memzero(&mut temp);
     memzero_vec_vec_u8(&mut y);
-    memzero(&mut yv);
+    // memzero(&mut yv);
     memzero(&mut values);
 
     Ok(result)
