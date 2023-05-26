@@ -93,6 +93,40 @@ pub fn split_secret(
     }
 }
 
+pub fn recover_secret(indexes: &[usize], shares: &[Vec<u8>]) -> Result<Vec<u8>, ShamirError> {
+    let threshold = shares.len();
+    if threshold == 0 || indexes.len() != threshold {
+        return Err(ShamirError::InvalidThreshold);
+    }
+    let share_length = shares[0].len();
+    validate_parameters(threshold, threshold, share_length)?;
+
+    shares.iter().all(|share| share.len() == share_length)
+        .then_some(()).ok_or(ShamirError::SharesUnequalLength)?;
+
+    if threshold == 1 {
+        Ok(shares[0].clone())
+    } else {
+        let indexes = indexes.iter().map(|x| *x as u8).collect::<Vec<_>>();
+        let mut digest = interpolate(threshold, &indexes, share_length, shares, DIGEST_INDEX)?;
+        let secret = interpolate(threshold, &indexes, share_length, shares, SECRET_INDEX)?;
+        let mut verify = create_digest(&digest[4..], &secret);
+
+        let mut valid = true;
+        for i in 0..4 {
+            valid &= digest[i] == verify[i];
+        }
+        memzero(&mut digest);
+        memzero(&mut verify);
+
+        if !valid {
+            return Err(ShamirError::ChecksumFailure);
+        }
+
+        Ok(secret)
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -133,6 +167,11 @@ mod tests {
         assert_eq!(shares[2], hex!("d9ad4e3bec2e1a7485698823abf05d36"));
         assert_eq!(shares[3], hex!("0d8cf5f6ec337bc764d1866b5d07ca42"));
         assert_eq!(shares[4], hex!("1aa7fe3199bc5092ef3816b074cabdf2"));
+
+        let recovered_share_indexes = vec![1, 2, 4];
+        let recovered_shares = recovered_share_indexes.iter().map(|index| shares[*index].clone()).collect::<Vec<_>>();
+        let recovered_secret = recover_secret(&recovered_share_indexes, &recovered_shares).unwrap();
+        assert_eq!(recovered_secret, secret);
     }
 
     #[test]
@@ -150,5 +189,10 @@ mod tests {
         assert_eq!(shares[4], hex!("2b851d188b8f5b3653659cc0f7fa45102dadf04b708767385cd803862fcb3c3f"));
         assert_eq!(shares[5], hex!("a797d4a32d2a39a4aacd9de48036478fff77b1e83b4f16a099c34bfb0b7acdee"));
         assert_eq!(shares[6], hex!("28a19475dcde9f09ba2e9e881979413592027216e60c8513cdee937c67b2c586"));
+
+        let recovered_share_indexes = vec![3, 4];
+        let recovered_shares = recovered_share_indexes.iter().map(|index| shares[*index].clone()).collect::<Vec<_>>();
+        let recovered_secret = recover_secret(&recovered_share_indexes, &recovered_shares).unwrap();
+        assert_eq!(recovered_secret, secret);
     }
 }

@@ -11,4 +11,5 @@ pub enum ShamirError {
     SecretTooShort,
     SecretNotEvenLen,
     InvalidThreshold,
+    SharesUnequalLength,
 }
