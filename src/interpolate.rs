@@ -1,6 +1,6 @@
 use crate::{
     hazmat::{bitslice, bitslice_setall, gf256_add, gf256_mul, gf256_inv, unbitslice},
-    ShamirError, SHAMIR_MAX_SECRET_SIZE
+    ShamirError, MAX_SECRET_LEN
 };
 use bc_crypto::{memzero, memzero_vec_vec_u8};
 
@@ -97,23 +97,25 @@ fn hazmat_lagrange_basis(values: &mut [u8], n: usize, xc: &[u8], x: u8) {
 ///         yij: array of n pointers to arrays of length yl
 ///         x: coordinate to interpolate at
 ///         result: space for yl bytes of interpolate data
-pub fn interpolate(
+pub fn interpolate<T>(
     n: usize,
     xi: &[u8],
     yl: usize,
-    yij: &[Vec<u8>],
+    yij: &[T],
     x: u8
 ) -> Result<Vec<u8>, ShamirError>
+where
+    T: AsRef<[u8]>
 {
     // The hazmat gf256 implementation needs the y-coordinate data
     // to be in 32-byte blocks
-    let mut y = vec![vec![0u8; SHAMIR_MAX_SECRET_SIZE]; n];
+    let mut y = vec![vec![0u8; MAX_SECRET_LEN]; n];
     // let mut yv = vec![0u8; SHAMIR_MAX_SECRET_SIZE * n];
-    let mut values = vec![0u8; SHAMIR_MAX_SECRET_SIZE];
+    let mut values = vec![0u8; MAX_SECRET_LEN];
 
     // yv[..yl].copy_from_slice(&yij[0]);
     for i in 0..n {
-        y[i][..yl].copy_from_slice(&yij[i]);
+        y[i][..yl].copy_from_slice(yij[i].as_ref());
     }
 
     let mut lagrange = vec![0u8; n];

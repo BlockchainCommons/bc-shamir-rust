@@ -1,12 +1,10 @@
 use bc_crypto::{hash::hmac_sha256, RandomNumberGenerator, memzero, memzero_vec_vec_u8};
 
 use crate::{
+    MAX_SHARE_COUNT,
+    MAX_SECRET_LEN,
+    MIN_SECRET_LEN,
     ShamirError,
-    constants::{
-        SHAMIR_MAX_SHARE_COUNT,
-        SHAMIR_MAX_SECRET_SIZE,
-        SHAMIR_MIN_SECRET_SIZE
-    },
     interpolate::interpolate,
 };
 
@@ -18,13 +16,13 @@ fn create_digest(random_data: &[u8], shared_secret: &[u8]) -> [u8; 32] {
 }
 
 fn validate_parameters(threshold: usize, share_count: usize, secret_length: usize) -> Result<(), ShamirError> {
-    if share_count > SHAMIR_MAX_SHARE_COUNT {
+    if share_count > MAX_SHARE_COUNT {
         return Err(ShamirError::TooManyShares);
     } else if threshold < 1 || threshold > share_count {
         return Err(ShamirError::InvalidThreshold);
-    } else if secret_length > SHAMIR_MAX_SECRET_SIZE {
+    } else if secret_length > MAX_SECRET_LEN {
         return Err(ShamirError::SecretTooLong);
-    } else if secret_length < SHAMIR_MIN_SECRET_SIZE {
+    } else if secret_length < MIN_SECRET_LEN {
         return Err(ShamirError::SecretTooShort);
     } else if secret_length & 1 != 0 {
         return Err(ShamirError::SecretNotEvenLen);
@@ -89,19 +87,21 @@ pub fn split_secret(
     }
 }
 
-pub fn recover_secret(indexes: &[usize], shares: &[Vec<u8>]) -> Result<Vec<u8>, ShamirError> {
+pub fn recover_secret<T>(indexes: &[usize], shares: &[T]) -> Result<Vec<u8>, ShamirError>
+    where T: AsRef<[u8]>
+{
     let threshold = shares.len();
     if threshold == 0 || indexes.len() != threshold {
         return Err(ShamirError::InvalidThreshold);
     }
-    let share_length = shares[0].len();
+    let share_length = shares[0].as_ref().len();
     validate_parameters(threshold, threshold, share_length)?;
 
-    shares.iter().all(|share| share.len() == share_length)
+    shares.iter().all(|share| share.as_ref().len() == share_length)
         .then_some(()).ok_or(ShamirError::SharesUnequalLength)?;
 
     if threshold == 1 {
-        Ok(shares[0].clone())
+        Ok(shares[0].as_ref().to_vec())
     } else {
         let indexes = indexes.iter().map(|x| *x as u8).collect::<Vec<_>>();
         let mut digest = interpolate(threshold, &indexes, share_length, shares, DIGEST_INDEX)?;
