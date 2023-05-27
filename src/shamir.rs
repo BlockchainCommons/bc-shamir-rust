@@ -1,4 +1,4 @@
-use bc_crypto::{hash::hmac_sha256, RandomNumberGenerator};
+use bc_crypto::{hash::hmac_sha256, RandomNumberGenerator, memzero, memzero_vec_vec_u8};
 
 use crate::{
     ShamirError,
@@ -8,10 +8,6 @@ use crate::{
         SHAMIR_MIN_SECRET_SIZE
     },
     interpolate::interpolate,
-    hazmat::{
-        memzero,
-        memzero_vec_vec_u8
-    }
 };
 
 const SECRET_INDEX: u8 = 255;

@@ -1,5 +1,5 @@
 [package]
-name = "bc-shamir-rust"
+name = "bc-shamir"
 version = "0.1.0"
 edition = "2021"
 description = "Shamir's Secret Sharing (SSS) for Rust."

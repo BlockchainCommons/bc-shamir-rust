@@ -1,7 +1,8 @@
 use crate::{
-    hazmat::{bitslice, bitslice_setall, gf256_add, gf256_mul, gf256_inv, unbitslice, memzero, memzero_vec_vec_u8},
+    hazmat::{bitslice, bitslice_setall, gf256_add, gf256_mul, gf256_inv, unbitslice},
     ShamirError, SHAMIR_MAX_SECRET_SIZE
 };
+use bc_crypto::{memzero, memzero_vec_vec_u8};
 
 /// Calculate the lagrange basis coefficients for the lagrange polynomial
 /// defined byt the x coordinates xc at the value x.
