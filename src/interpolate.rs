@@ -1,6 +1,6 @@
 use crate::{
     hazmat::{bitslice, bitslice_setall, gf256_add, gf256_mul, gf256_inv, unbitslice},
-    ShamirError, MAX_SECRET_LEN
+    Error, MAX_SECRET_LEN
 };
 use bc_crypto::{memzero, memzero_vec_vec_u8};
 
@@ -103,7 +103,7 @@ pub fn interpolate<T>(
     yl: usize,
     yij: &[T],
     x: u8
-) -> Result<Vec<u8>, ShamirError>
+) -> Result<Vec<u8>, Error>
 where
     T: AsRef<[u8]>
 {

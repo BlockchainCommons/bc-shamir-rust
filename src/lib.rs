@@ -5,8 +5,8 @@ pub const MAX_SHARE_COUNT: usize = 16;
 mod hazmat;
 mod interpolate;
 
-mod shamir_error;
-pub use shamir_error::ShamirError;
+mod error;
+pub use error::Error;
 
 mod shamir;
 pub use shamir::{split_secret, recover_secret};

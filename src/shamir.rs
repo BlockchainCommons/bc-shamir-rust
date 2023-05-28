@@ -4,7 +4,7 @@ use crate::{
     MAX_SHARE_COUNT,
     MAX_SECRET_LEN,
     MIN_SECRET_LEN,
-    ShamirError,
+    Error,
     interpolate::interpolate,
 };
 
@@ -15,17 +15,17 @@ fn create_digest(random_data: &[u8], shared_secret: &[u8]) -> [u8; 32] {
     hmac_sha256(random_data, shared_secret)
 }
 
-fn validate_parameters(threshold: usize, share_count: usize, secret_length: usize) -> Result<(), ShamirError> {
+fn validate_parameters(threshold: usize, share_count: usize, secret_length: usize) -> Result<(), Error> {
     if share_count > MAX_SHARE_COUNT {
-        return Err(ShamirError::TooManyShares);
+        return Err(Error::TooManyShares);
     } else if threshold < 1 || threshold > share_count {
-        return Err(ShamirError::InvalidThreshold);
+        return Err(Error::InvalidThreshold);
     } else if secret_length > MAX_SECRET_LEN {
-        return Err(ShamirError::SecretTooLong);
+        return Err(Error::SecretTooLong);
     } else if secret_length < MIN_SECRET_LEN {
-        return Err(ShamirError::SecretTooShort);
+        return Err(Error::SecretTooShort);
     } else if secret_length & 1 != 0 {
-        return Err(ShamirError::SecretNotEvenLen);
+        return Err(Error::SecretNotEvenLen);
     }
     Ok(())
 }
@@ -35,7 +35,7 @@ pub fn split_secret(
     share_count: usize,
     secret: &[u8],
     random_generator: &mut impl RandomNumberGenerator
-) -> Result<Vec<Vec<u8>>, ShamirError> {
+) -> Result<Vec<Vec<u8>>, Error> {
     validate_parameters(threshold, share_count, secret.len())?;
 
     if threshold == 1 {
@@ -87,18 +87,18 @@ pub fn split_secret(
     }
 }
 
-pub fn recover_secret<T>(indexes: &[usize], shares: &[T]) -> Result<Vec<u8>, ShamirError>
+pub fn recover_secret<T>(indexes: &[usize], shares: &[T]) -> Result<Vec<u8>, Error>
     where T: AsRef<[u8]>
 {
     let threshold = shares.len();
     if threshold == 0 || indexes.len() != threshold {
-        return Err(ShamirError::InvalidThreshold);
+        return Err(Error::InvalidThreshold);
     }
     let share_length = shares[0].as_ref().len();
     validate_parameters(threshold, threshold, share_length)?;
 
     shares.iter().all(|share| share.as_ref().len() == share_length)
-        .then_some(()).ok_or(ShamirError::SharesUnequalLength)?;
+        .then_some(()).ok_or(Error::SharesUnequalLength)?;
 
     if threshold == 1 {
         Ok(shares[0].as_ref().to_vec())
@@ -116,7 +116,7 @@ pub fn recover_secret<T>(indexes: &[usize], shares: &[T]) -> Result<Vec<u8>, Sha
         memzero(&mut verify);
 
         if !valid {
-            return Err(ShamirError::ChecksumFailure);
+            return Err(Error::ChecksumFailure);
         }
 
         Ok(secret)
