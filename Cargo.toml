@@ -8,6 +8,7 @@ keywords = ["cryptography"]
 repository = "https://github.com/BlockchainCommons/bc-shamir-rust"
 readme = "README.md"
 categories = ["cryptography"]
+documentation = "https://docs.rs/bc-shamir"
 
 [dependencies]
 bc-crypto = { path = "../bc-crypto-rust" }
