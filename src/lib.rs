@@ -1,3 +1,6 @@
+#![doc(html_root_url = "https://docs.rs/bc-shamir/0.1.0")]
+#![warn(rust_2018_idioms)]
+
 pub const MIN_SECRET_LEN: usize = 16;
 pub const MAX_SECRET_LEN: usize = 32;
 pub const MAX_SHARE_COUNT: usize = 16;
