@@ -83,4 +83,14 @@ mod tests {
         let recovered_secret = recover_secret(&recovered_share_indexes, &recovered_shares).unwrap();
         assert_eq!(recovered_secret, secret);
     }
+    
+    #[test]
+    fn test_readme_deps() {
+        version_sync::assert_markdown_deps_updated!("README.md");
+    }
+
+    #[test]
+    fn test_html_root_url() {
+        version_sync::assert_html_root_url_updated!("src/lib.rs");
+    }
 }
