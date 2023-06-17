@@ -53,7 +53,7 @@ fn validate_parameters(threshold: usize, share_count: usize, secret_length: usiz
 /// the function fails, the `Result` contains `Err(error)`, where `error` is an
 /// `Error` object describing the failure.
 ///
-/// # Examples
+/// # Example
 ///
 /// ```
 /// use bc_shamir::split_secret;
@@ -142,7 +142,7 @@ pub fn split_secret(
 /// `Result` contains `Err(error)`, where `error` is an `Error` object
 /// describing the failure.
 ///
-/// # Examples
+/// # Example
 ///
 /// ```
 /// use bc_shamir::recover_secret;
