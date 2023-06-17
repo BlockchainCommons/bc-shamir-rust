@@ -30,6 +30,43 @@ fn validate_parameters(threshold: usize, share_count: usize, secret_length: usiz
     Ok(())
 }
 
+/// Splits a secret into shares using the Shamir secret sharing algorithm.
+///
+/// # Arguments
+///
+/// * `threshold` - The minimum number of shares required to reconstruct the
+///   secret. Must be greater than or equal to 1 and less than or equal to
+///  `share_count`.
+/// * `share_count` - The total number of shares to generate. Must be at least
+///  `threshold` and less than or equal to `MAX_SHARE_COUNT`.
+/// * `secret` - A byte slice containing the secret to be split. Must be at
+///  least `MIN_SECRET_LEN` bytes long and at most `MAX_SECRET_LEN` bytes
+///  long. The length must be an even number.
+/// * `random_generator` - An implementation of the `RandomNumberGenerator`
+///   trait, used to generate random data.
+///
+/// # Returns
+///
+/// A `Result` containing a vector of vectors of bytes (`Vec<Vec<u8>>`)
+/// representing the shares of the secret. If the function succeeds, the
+/// `Result` contains `Ok(result)`, where `result` is the vector of shares. If
+/// the function fails, the `Result` contains `Err(error)`, where `error` is an
+/// `Error` object describing the failure.
+///
+/// # Examples
+///
+/// ```
+/// use bc_shamir::split_secret;
+///
+/// let threshold = 2;
+/// let share_count = 3;
+/// let secret = b"my secret belongs to me.";
+/// let mut random_generator = bc_crypto::SecureRandomNumberGenerator;
+///
+/// let shares = split_secret(threshold, share_count, secret, &mut random_generator).unwrap();
+///
+/// assert_eq!(shares.len(), share_count);
+/// ```
 pub fn split_secret(
     threshold: usize,
     share_count: usize,
@@ -87,6 +124,39 @@ pub fn split_secret(
     }
 }
 
+/// Recovers the secret from the given shares using the Shamir secret sharing
+/// algorithm.
+///
+/// # Arguments
+///
+/// * `indexes` - A slice of indexes of the shares to be used for recovering the
+///   secret. These are the indexes of the shares returned by `split_secret`.
+/// * `shares` - A slice of shares of the secret matching the indexes in
+///  `indexes`. These are the shares returned by `split_secret`.
+///
+/// # Returns
+///
+/// A `Result` containing a vector of bytes (`Vec<u8>`) representing the secret.
+/// If the function succeeds, the `Result` contains `Ok(result)`, where `result`
+/// is the vector of bytes representing the secret. If the function fails, the
+/// `Result` contains `Err(error)`, where `error` is an `Error` object
+/// describing the failure.
+///
+/// # Examples
+///
+/// ```
+/// use bc_shamir::recover_secret;
+///
+/// let indexes = vec![0, 2];
+/// let shares = vec![
+///     vec![47, 165, 102, 232, 218, 99, 6, 94, 39, 6, 253, 215, 12, 88, 64, 32, 105, 40, 222, 146, 93, 197, 48, 129],
+///     vec![221, 174, 116, 201, 90, 99, 136, 33, 64, 215, 60, 84, 207, 28, 74, 10, 111, 243, 43, 224, 48, 64, 199, 172],
+/// ];
+///
+/// let secret = recover_secret(&indexes, &shares).unwrap();
+///
+/// assert_eq!(secret, b"my secret belongs to me.");
+/// ```
 pub fn recover_secret<T>(indexes: &[usize], shares: &[T]) -> Result<Vec<u8>, Error>
     where T: AsRef<[u8]>
 {
@@ -120,5 +190,40 @@ pub fn recover_secret<T>(indexes: &[usize], shares: &[T]) -> Result<Vec<u8>, Err
         }
 
         Ok(secret)
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use crate::recover_secret;
+
+    use super::split_secret;
+
+    #[test]
+    fn example_split() {
+        let threshold = 2;
+        let share_count = 3;
+        let secret = b"my secret belongs to me.";
+        let mut random_generator = bc_crypto::SecureRandomNumberGenerator;
+        let shares = split_secret(threshold, share_count, secret, &mut random_generator).unwrap();
+        assert_eq!(shares.len(), share_count);
+
+        // Print out the shares, one per line.
+        // for share in shares {
+        //     println!("{:?}", share);
+        // }
+    }
+
+    #[test]
+    fn example_recover() {
+        let indexes = vec![0, 2];
+        let shares = vec![
+            vec![47, 165, 102, 232, 218, 99, 6, 94, 39, 6, 253, 215, 12, 88, 64, 32, 105, 40, 222, 146, 93, 197, 48, 129],
+            vec![221, 174, 116, 201, 90, 99, 136, 33, 64, 215, 60, 84, 207, 28, 74, 10, 111, 243, 43, 224, 48, 64, 199, 172],
+        ];
+
+        let secret = recover_secret(&indexes, &shares).unwrap();
+
+        assert_eq!(secret, b"my secret belongs to me.");
     }
 }

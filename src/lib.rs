@@ -1,8 +1,13 @@
 #![doc(html_root_url = "https://docs.rs/bc-shamir/0.1.0")]
 #![warn(rust_2018_idioms)]
 
+/// The minimum length of a secret.
 pub const MIN_SECRET_LEN: usize = 16;
+
+/// The maximum length of a secret.
 pub const MAX_SECRET_LEN: usize = 32;
+
+/// The maximum number of shares that can be generated from a secret.
 pub const MAX_SHARE_COUNT: usize = 16;
 
 mod hazmat;
@@ -83,7 +88,7 @@ mod tests {
         let recovered_secret = recover_secret(&recovered_share_indexes, &recovered_shares).unwrap();
         assert_eq!(recovered_secret, secret);
     }
-    
+
     #[test]
     fn test_readme_deps() {
         version_sync::assert_markdown_deps_updated!("README.md");
