@@ -1,4 +1,4 @@
-#[derive(Debug, PartialEq, Eq, Clone)]
+#[derive(Debug)]
 pub enum Error {
     SecretTooLong,
     TooManyShares,
@@ -12,16 +12,17 @@ pub enum Error {
 
 impl std::fmt::Display for Error {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        match *self {
-            Error::SecretTooLong => write!(f, "Secret is too long"),
-            Error::TooManyShares => write!(f, "Too many shares"),
-            Error::InterpolationFailure => write!(f, "Interpolation failed"),
-            Error::ChecksumFailure => write!(f, "Checksum failure"),
-            Error::SecretTooShort => write!(f, "Secret is too short"),
-            Error::SecretNotEvenLen => write!(f, "Secret is not of even length"),
-            Error::InvalidThreshold => write!(f, "Invalid threshold"),
-            Error::SharesUnequalLength => write!(f, "Shares have unequal length"),
-        }
+        let s = match *self {
+            Error::SecretTooLong => "Secret is too long".to_string(),
+            Error::TooManyShares => "Too many shares".to_string(),
+            Error::InterpolationFailure => "Interpolation failed".to_string(),
+            Error::ChecksumFailure => "Checksum failure".to_string(),
+            Error::SecretTooShort => "Secret is too short".to_string(),
+            Error::SecretNotEvenLen => "Secret is not of even length".to_string(),
+            Error::InvalidThreshold => "Invalid threshold".to_string(),
+            Error::SharesUnequalLength => "Shares have unequal length".to_string(),
+        };
+        f.write_str(&s)
     }
 }
 
