@@ -1,4 +1,4 @@
-#![doc(html_root_url = "https://docs.rs/bc-shamir/0.1.2")]
+#![doc(html_root_url = "https://docs.rs/bc-shamir/0.2.0")]
 #![warn(rust_2018_idioms)]
 
 //! ## Introduction
@@ -16,7 +16,7 @@
 //!
 //! ```toml
 //! [dependencies]
-//! bc-shamir = "0.1.2"
+//! bc-shamir = "0.2.0"
 //!```
 //!
 //! ## Usage
@@ -29,7 +29,7 @@
 //! let secret = b"my secret belongs to me.";
 //! let threshold = 2;
 //! let share_count = 3;
-//! let mut random_generator = bc_crypto::SecureRandomNumberGenerator;
+//! let mut random_generator = bc_rand::SecureRandomNumberGenerator;
 //!
 //! let shares = split_secret(threshold, share_count, secret, &mut random_generator).unwrap();
 //!
@@ -76,7 +76,7 @@ pub use shamir::{split_secret, recover_secret};
 #[cfg(test)]
 mod tests {
     use super::*;
-    use bc_crypto::RandomNumberGenerator;
+    use bc_rand::RandomNumberGenerator;
     use hex_literal::hex;
 
     struct FakeRandomNumberGenerator;

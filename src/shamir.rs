@@ -1,4 +1,5 @@
-use bc_crypto::{hash::hmac_sha256, RandomNumberGenerator, memzero, memzero_vec_vec_u8};
+use bc_crypto::{hash::hmac_sha256, memzero, memzero_vec_vec_u8};
+use bc_rand::RandomNumberGenerator;
 
 use crate::{
     MAX_SHARE_COUNT,
@@ -61,7 +62,7 @@ fn validate_parameters(threshold: usize, share_count: usize, secret_length: usiz
 /// let threshold = 2;
 /// let share_count = 3;
 /// let secret = b"my secret belongs to me.";
-/// let mut random_generator = bc_crypto::SecureRandomNumberGenerator;
+/// let mut random_generator = bc_rand::SecureRandomNumberGenerator;
 ///
 /// let shares = split_secret(threshold, share_count, secret, &mut random_generator).unwrap();
 ///
@@ -195,8 +196,8 @@ pub fn recover_secret<T>(indexes: &[usize], shares: &[T]) -> Result<Vec<u8>, Err
 
 #[cfg(test)]
 mod tests {
+    use bc_rand::SecureRandomNumberGenerator;
     use crate::recover_secret;
-
     use super::split_secret;
 
     #[test]
@@ -204,7 +205,7 @@ mod tests {
         let threshold = 2;
         let share_count = 3;
         let secret = b"my secret belongs to me.";
-        let mut random_generator = bc_crypto::SecureRandomNumberGenerator;
+        let mut random_generator = SecureRandomNumberGenerator;
         let shares = split_secret(threshold, share_count, secret, &mut random_generator).unwrap();
         assert_eq!(shares.len(), share_count);
 
