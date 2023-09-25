@@ -14,7 +14,7 @@ This is a pure-Rust implementation of [Shamir's Secret Sharing (SSS)](https://en
 
 ```toml
 [dependencies]
-bc-shamir = "0.2.0"
+bc-shamir = "0.3.0"
 ```
 ## Related Projects
 
@@ -24,7 +24,7 @@ The primary client of this library is [sskr](https://crates.io/crates/sskr), whi
 
 `bc-shamir` is currently in a community review stage. We would appreciate your consideration and/or testing of the libraries. Obviously, let us know if you find any mistakes or problems. But also let us know if the API meets your needs, if the functionality is easy to use, if the usage of Rust feels properly standardized, and if the library solves any problems you are encountering when doing this kind of coding. Also let us know how it could be improved and what else you'd need for this to be just right for your usage. Comments can be posted [to the Gordian Developer Community](https://github.com/BlockchainCommons/Gordian-Developer-Community/discussions/116).
 
-Because this library is still in a community review stage, it should not be used for production tasks until it has had further testing and auditing. 
+Because this library is still in a community review stage, it should not be used for production tasks until it has had further testing and auditing.
 
 See [Blockchain Commons' Development Phases](https://github.com/BlockchainCommons/Community/blob/master/release-path.md).
 
