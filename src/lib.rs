@@ -1,4 +1,4 @@
-#![doc(html_root_url = "https://docs.rs/bc-shamir/0.3.0")]
+#![doc(html_root_url = "https://docs.rs/bc-shamir/0.3.1")]
 #![warn(rust_2018_idioms)]
 
 //! ## Introduction
@@ -16,7 +16,7 @@
 //!
 //! ```toml
 //! [dependencies]
-//! bc-shamir = "0.3.0"
+//! bc-shamir = "0.3.1"
 //!```
 //!
 //! ## Usage
