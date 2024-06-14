@@ -1,4 +1,4 @@
-#![doc(html_root_url = "https://docs.rs/bc-shamir/0.3.2")]
+#![doc(html_root_url = "https://docs.rs/bc-shamir/0.3.3")]
 #![warn(rust_2018_idioms)]
 
 //! ## Introduction
@@ -16,7 +16,7 @@
 //!
 //! ```toml
 //! [dependencies]
-//! bc-shamir = "0.3.2"
+//! bc-shamir = "0.3.3"
 //!```
 //!
 //! ## Usage
@@ -79,6 +79,7 @@ mod tests {
     use bc_rand::RandomNumberGenerator;
     use hex_literal::hex;
 
+    #[derive(Debug)]
     struct FakeRandomNumberGenerator;
 
     impl RandomNumberGenerator for FakeRandomNumberGenerator {
