@@ -78,15 +78,30 @@ mod tests {
     use super::*;
     use bc_rand::RandomNumberGenerator;
     use hex_literal::hex;
+    use rand::RngCore;
 
     #[derive(Debug)]
     struct FakeRandomNumberGenerator;
 
-    impl RandomNumberGenerator for FakeRandomNumberGenerator {
+    impl RngCore for FakeRandomNumberGenerator {
         fn next_u64(&mut self) -> u64 {
             unimplemented!()
         }
 
+        fn next_u32(&mut self) -> u32 {
+            unimplemented!()
+        }
+
+        fn fill_bytes(&mut self, _dest: &mut [u8]) {
+            unimplemented!()
+        }
+
+        fn try_fill_bytes(&mut self, _dest: &mut [u8]) -> Result<(), rand::Error> {
+            unimplemented!()
+        }
+    }
+
+    impl RandomNumberGenerator for FakeRandomNumberGenerator {
         fn random_data(&mut self, size: usize) -> Vec<u8> {
             let mut b = vec![0u8; size];
             self.fill_random_data(&mut b);
