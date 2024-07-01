@@ -14,7 +14,7 @@ This is a pure-Rust implementation of [Shamir's Secret Sharing (SSS)](https://en
 
 ```toml
 [dependencies]
-bc-shamir = "0.3.3"
+bc-shamir = "0.4.0"
 ```
 ## Related Projects
 
