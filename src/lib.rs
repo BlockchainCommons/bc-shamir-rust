@@ -1,4 +1,4 @@
-#![doc(html_root_url = "https://docs.rs/bc-shamir/0.4.0")]
+#![doc(html_root_url = "https://docs.rs/bc-shamir/0.4.1")]
 #![warn(rust_2018_idioms)]
 
 //! ## Introduction
@@ -16,7 +16,7 @@
 //!
 //! ```toml
 //! [dependencies]
-//! bc-shamir = "0.4.0"
+//! bc-shamir = "0.4.1"
 //!```
 //!
 //! ## Usage
@@ -78,7 +78,7 @@ mod tests {
     use super::*;
     use bc_rand::RandomNumberGenerator;
     use hex_literal::hex;
-    use rand::RngCore;
+    use rand::{CryptoRng, RngCore};
 
     #[derive(Debug)]
     struct FakeRandomNumberGenerator;
@@ -100,6 +100,9 @@ mod tests {
             unimplemented!()
         }
     }
+
+    // Testing purposes only!
+    impl CryptoRng for FakeRandomNumberGenerator {}
 
     impl RandomNumberGenerator for FakeRandomNumberGenerator {
         fn random_data(&mut self, size: usize) -> Vec<u8> {
