@@ -4,12 +4,12 @@ version = "0.4.1"
 edition = "2021"
 description = "Shamir's Secret Sharing (SSS) for Rust."
 authors = ["Blockchain Commons"]
-keywords = ["cryptography"]
 repository = "https://github.com/BlockchainCommons/bc-shamir-rust"
 readme = "README.md"
 license = "BSD-2-Clause-Patent"
-categories = ["cryptography"]
 documentation = "https://docs.rs/bc-shamir"
+keywords = ["cryptography"] # Up to five
+categories = ["cryptography"] # https://crates.io/category_slugs
 
 [dependencies]
 bc-rand = "^0.2.0"
