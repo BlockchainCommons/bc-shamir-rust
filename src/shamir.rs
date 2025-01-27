@@ -37,12 +37,12 @@ fn validate_parameters(threshold: usize, share_count: usize, secret_length: usiz
 ///
 /// * `threshold` - The minimum number of shares required to reconstruct the
 ///   secret. Must be greater than or equal to 1 and less than or equal to
-///  `share_count`.
+///   `share_count`.
 /// * `share_count` - The total number of shares to generate. Must be at least
-///  `threshold` and less than or equal to `MAX_SHARE_COUNT`.
+///   `threshold` and less than or equal to `MAX_SHARE_COUNT`.
 /// * `secret` - A byte slice containing the secret to be split. Must be at
-///  least `MIN_SECRET_LEN` bytes long and at most `MAX_SECRET_LEN` bytes
-///  long. The length must be an even number.
+///   least `MIN_SECRET_LEN` bytes long and at most `MAX_SECRET_LEN` bytes
+///   long. The length must be an even number.
 /// * `random_generator` - An implementation of the `RandomNumberGenerator`
 ///   trait, used to generate random data.
 ///
@@ -133,7 +133,7 @@ pub fn split_secret(
 /// * `indexes` - A slice of indexes of the shares to be used for recovering the
 ///   secret. These are the indexes of the shares returned by `split_secret`.
 /// * `shares` - A slice of shares of the secret matching the indexes in
-///  `indexes`. These are the shares returned by `split_secret`.
+///   `indexes`. These are the shares returned by `split_secret`.
 ///
 /// # Returns
 ///
