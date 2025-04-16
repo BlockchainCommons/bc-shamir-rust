@@ -8,14 +8,15 @@
 
 ## Introduction
 
-This is a pure-Rust implementation of [Shamir's Secret Sharing (SSS)](https://en.wikipedia.org/wiki/Shamir%27s_secret_sharing) is a cryptographic technique in which a *secret* is divided into parts, called *shares*, in such a way that a *threshold* of several shares are needed to reconstruct the secret. The shares are distributed in a way that makes it impossible for an attacker to know anything about the secret without having a threshold of shares. If the number of shares is less than the threshold, then no information about the secret is revealed.
+This is a pure-Rust implementation of [Shamir's Secret Sharing (SSS)](https://en.wikipedia.org/wiki/Shamir%27s_secret_sharing) is a cryptographic technique in which a _secret_ is divided into parts, called _shares_, in such a way that a _threshold_ of several shares are needed to reconstruct the secret. The shares are distributed in a way that makes it impossible for an attacker to know anything about the secret without having a threshold of shares. If the number of shares is less than the threshold, then no information about the secret is revealed.
 
 ## Getting Started
 
 ```toml
 [dependencies]
-bc-shamir = "0.5.0"
+bc-shamir = "0.6.0"
 ```
+
 ## Related Projects
 
 The primary client of this library is [sskr](https://crates.io/crates/sskr), which implements [Sharded Secret Key Reconstruction (SSKR)](https://github.com/BlockchainCommons/Research/blob/master/papers/bcr-2020-011-sskr.md)
@@ -59,10 +60,10 @@ If your company requires support to use our projects, please feel free to contac
 
 The following people directly contributed to this repository. You can add your name here by getting involved. The first step is learning how to contribute from our [CONTRIBUTING.md](./CONTRIBUTING.md) documentation.
 
-| Name              | Role                | Github                                            | Email                                 | GPG Fingerprint                                    |
-| ----------------- | ------------------- | ------------------------------------------------- | ------------------------------------- | -------------------------------------------------- |
-| Christopher Allen | Principal Architect | [@ChristopherA](https://github.com/ChristopherA)  | \<ChristopherA@LifeWithAlacrity.com\> | FDFE 14A5 4ECB 30FC 5D22  74EF F8D3 6C91 3574 05ED |
-| Wolf McNally      | Lead Researcher/Engineer         | [@WolfMcNally](https://github.com/wolfmcnally)    | \<Wolf@WolfMcNally.com\>              | 9436 52EE 3844 1760 C3DC  3536 4B6C 2FCF 8947 80AE |
+| Name              | Role                     | Github                                           | Email                                 | GPG Fingerprint                                    |
+| ----------------- | ------------------------ | ------------------------------------------------ | ------------------------------------- | -------------------------------------------------- |
+| Christopher Allen | Principal Architect      | [@ChristopherA](https://github.com/ChristopherA) | \<ChristopherA@LifeWithAlacrity.com\> | FDFE 14A5 4ECB 30FC 5D22 74EF F8D3 6C91 3574 05ED  |
+| Wolf McNally      | Lead Researcher/Engineer | [@WolfMcNally](https://github.com/wolfmcnally)   | \<Wolf@WolfMcNally.com\>              | 9436 52EE 3844 1760 C3DC  3536 4B6C 2FCF 8947 80AE |
 
 ## Responsible Disclosure
 
@@ -76,8 +77,8 @@ Please report suspected security vulnerabilities in private via email to Christo
 
 The following keys may be used to communicate sensitive information to developers:
 
-| Name              | Fingerprint                                        |
-| ----------------- | -------------------------------------------------- |
-| Christopher Allen | FDFE 14A5 4ECB 30FC 5D22  74EF F8D3 6C91 3574 05ED |
+| Name              | Fingerprint                                       |
+| ----------------- | ------------------------------------------------- |
+| Christopher Allen | FDFE 14A5 4ECB 30FC 5D22 74EF F8D3 6C91 3574 05ED |
 
 You can import a key by running the following command with that individual’s fingerprint: `gpg --recv-keys "<fingerprint>"` Ensure that you put quotes around fingerprints that contain spaces.
