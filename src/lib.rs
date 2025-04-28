@@ -1,4 +1,4 @@
-#![doc(html_root_url = "https://docs.rs/bc-shamir/0.6.0")]
+#![doc(html_root_url = "https://docs.rs/bc-shamir/0.7.0")]
 #![warn(rust_2018_idioms)]
 
 //! ## Introduction
@@ -16,7 +16,7 @@
 //!
 //! ```toml
 //! [dependencies]
-//! bc-shamir = "0.6.0"
+//! bc-shamir = "0.7.0"
 //!```
 //!
 //! ## Usage
@@ -70,14 +70,14 @@ mod error;
 pub use error::Error;
 
 mod shamir;
-pub use shamir::{recover_secret, split_secret};
+pub use shamir::{ recover_secret, split_secret };
 
 #[cfg(test)]
 mod tests {
     use super::*;
     use bc_rand::RandomNumberGenerator;
     use hex_literal::hex;
-    use rand::{CryptoRng, RngCore};
+    use rand::{ CryptoRng, RngCore };
 
     #[derive(Debug)]
     struct FakeRandomNumberGenerator;
