@@ -26,3 +26,5 @@ pub enum Error {
     #[error("shares have unequal length")]
     SharesUnequalLength,
 }
+
+pub type Result<T> = std::result::Result<T, Error>;

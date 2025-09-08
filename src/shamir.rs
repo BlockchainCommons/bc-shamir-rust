@@ -6,6 +6,7 @@ use crate::{
     MAX_SECRET_LEN,
     MIN_SECRET_LEN,
     Error,
+    Result,
     interpolate::interpolate,
 };
 
@@ -16,7 +17,7 @@ fn create_digest(random_data: &[u8], shared_secret: &[u8]) -> [u8; 32] {
     hmac_sha256(random_data, shared_secret)
 }
 
-fn validate_parameters(threshold: usize, share_count: usize, secret_length: usize) -> Result<(), Error> {
+fn validate_parameters(threshold: usize, share_count: usize, secret_length: usize) -> Result<()> {
     if share_count > MAX_SHARE_COUNT {
         return Err(Error::TooManyShares);
     } else if threshold < 1 || threshold > share_count {
@@ -73,7 +74,7 @@ pub fn split_secret(
     share_count: usize,
     secret: &[u8],
     random_generator: &mut impl RandomNumberGenerator
-) -> Result<Vec<Vec<u8>>, Error> {
+) -> Result<Vec<Vec<u8>>> {
     validate_parameters(threshold, share_count, secret.len())?;
 
     if threshold == 1 {
@@ -158,7 +159,7 @@ pub fn split_secret(
 ///
 /// assert_eq!(secret, b"my secret belongs to me.");
 /// ```
-pub fn recover_secret<T>(indexes: &[usize], shares: &[T]) -> Result<Vec<u8>, Error>
+pub fn recover_secret<T>(indexes: &[usize], shares: &[T]) -> Result<Vec<u8>>
     where T: AsRef<[u8]>
 {
     let threshold = shares.len();

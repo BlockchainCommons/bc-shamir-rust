@@ -67,7 +67,7 @@ mod hazmat;
 mod interpolate;
 
 mod error;
-pub use error::Error;
+pub use error::{Error, Result};
 
 mod shamir;
 pub use shamir::{ recover_secret, split_secret };
@@ -95,7 +95,7 @@ mod tests {
             unimplemented!()
         }
 
-        fn try_fill_bytes(&mut self, _dest: &mut [u8]) -> Result<(), rand::Error> {
+        fn try_fill_bytes(&mut self, _dest: &mut [u8]) -> std::result::Result<(), rand::Error> {
             unimplemented!()
         }
     }
