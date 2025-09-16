@@ -1,6 +1,15 @@
 # Blockchain Commons Shamir Secret Sharing ("SSS") for Rust
 
-<!--Guidelines: https://github.com/BlockchainCommons/secure-template/wiki -->
+<!--| Wolf McNally      | Lead Researcher/Engineer | [@WolfMcNally](https://github.com/wolfmcnally)   | \<Wolf@WolfMcNally.com\>              | 9436 52EE 3844 1760 C3DC  3536 4B6C 2FCF 8947 80AE |
+
+## Version History
+
+### 0.9.0 - September 16, 2025
+
+- Migrate to thiserror v2. Error handling improvements.
+- Align to dependencies.
+
+## Responsible Disclosuredelines: https://github.com/BlockchainCommons/secure-template/wiki -->
 
 ### _by Wolf McNally_
 
@@ -14,7 +23,7 @@ This is a pure-Rust implementation of [Shamir's Secret Sharing (SSS)](https://en
 
 ```toml
 [dependencies]
-bc-shamir = "0.8.0"
+bc-shamir = "0.9.0"
 ```
 
 ## Related Projects
