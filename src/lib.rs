@@ -70,14 +70,14 @@ mod error;
 pub use error::{Error, Result};
 
 mod shamir;
-pub use shamir::{ recover_secret, split_secret };
+pub use shamir::{recover_secret, split_secret};
 
 #[cfg(test)]
 mod tests {
     use super::*;
     use bc_rand::RandomNumberGenerator;
     use hex_literal::hex;
-    use rand::{ CryptoRng, RngCore };
+    use rand::{CryptoRng, RngCore};
 
     #[derive(Debug)]
     struct FakeRandomNumberGenerator;
@@ -95,7 +95,10 @@ mod tests {
             unimplemented!()
         }
 
-        fn try_fill_bytes(&mut self, _dest: &mut [u8]) -> std::result::Result<(), rand::Error> {
+        fn try_fill_bytes(
+            &mut self,
+            _dest: &mut [u8],
+        ) -> std::result::Result<(), rand::Error> {
             unimplemented!()
         }
     }
@@ -138,45 +141,63 @@ mod tests {
             .iter()
             .map(|index| shares[*index].clone())
             .collect::<Vec<_>>();
-        let recovered_secret = recover_secret(&recovered_share_indexes, &recovered_shares).unwrap();
+        let recovered_secret =
+            recover_secret(&recovered_share_indexes, &recovered_shares)
+                .unwrap();
         assert_eq!(recovered_secret, secret);
     }
 
     #[test]
     fn test_split_secret_2_7() {
         let mut rng = FakeRandomNumberGenerator;
-        let secret = hex!("204188bfa6b440a1bdfd6753ff55a8241e07af5c5be943db917e3efabc184b1a");
+        let secret = hex!(
+            "204188bfa6b440a1bdfd6753ff55a8241e07af5c5be943db917e3efabc184b1a"
+        );
         //println!("secret: {}", hex::encode(secret));
         let shares = split_secret(2, 7, &secret, &mut rng).unwrap();
         assert_eq!(shares.len(), 7);
         //shares.iter().enumerate().for_each(|(index, share)| println!("{}: {}", index, hex::encode(share)));
         assert_eq!(
             shares[0],
-            hex!("2dcd14c2252dc8489af3985030e74d5a48e8eff1478ab86e65b43869bf39d556")
+            hex!(
+                "2dcd14c2252dc8489af3985030e74d5a48e8eff1478ab86e65b43869bf39d556"
+            )
         );
         assert_eq!(
             shares[1],
-            hex!("a1dfdd798388aada635b9974472b4fc59a32ae520c42c9f6a0af70149b882487")
+            hex!(
+                "a1dfdd798388aada635b9974472b4fc59a32ae520c42c9f6a0af70149b882487"
+            )
         );
         assert_eq!(
             shares[2],
-            hex!("2ee99daf727c0c7773b89a18de64497ff7476dacd1015a45f482a893f7402cef")
+            hex!(
+                "2ee99daf727c0c7773b89a18de64497ff7476dacd1015a45f482a893f7402cef"
+            )
         );
         assert_eq!(
             shares[3],
-            hex!("a2fb5414d4d96ee58a109b3ca9a84be0259d2c0f9ac92bdd3199e0eed3f1dd3e")
+            hex!(
+                "a2fb5414d4d96ee58a109b3ca9a84be0259d2c0f9ac92bdd3199e0eed3f1dd3e"
+            )
         );
         assert_eq!(
             shares[4],
-            hex!("2b851d188b8f5b3653659cc0f7fa45102dadf04b708767385cd803862fcb3c3f")
+            hex!(
+                "2b851d188b8f5b3653659cc0f7fa45102dadf04b708767385cd803862fcb3c3f"
+            )
         );
         assert_eq!(
             shares[5],
-            hex!("a797d4a32d2a39a4aacd9de48036478fff77b1e83b4f16a099c34bfb0b7acdee")
+            hex!(
+                "a797d4a32d2a39a4aacd9de48036478fff77b1e83b4f16a099c34bfb0b7acdee"
+            )
         );
         assert_eq!(
             shares[6],
-            hex!("28a19475dcde9f09ba2e9e881979413592027216e60c8513cdee937c67b2c586")
+            hex!(
+                "28a19475dcde9f09ba2e9e881979413592027216e60c8513cdee937c67b2c586"
+            )
         );
 
         let recovered_share_indexes = vec![3, 4];
@@ -184,7 +205,9 @@ mod tests {
             .iter()
             .map(|index| shares[*index].clone())
             .collect::<Vec<_>>();
-        let recovered_secret = recover_secret(&recovered_share_indexes, &recovered_shares).unwrap();
+        let recovered_secret =
+            recover_secret(&recovered_share_indexes, &recovered_shares)
+                .unwrap();
         assert_eq!(recovered_secret, secret);
     }
 
