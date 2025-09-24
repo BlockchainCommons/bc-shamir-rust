@@ -1,8 +1,11 @@
-use crate::{
-    hazmat::{bitslice, bitslice_setall, gf256_add, gf256_mul, gf256_inv, unbitslice},
-    Result, MAX_SECRET_LEN
-};
 use bc_crypto::{memzero, memzero_vec_vec_u8};
+
+use crate::{
+    MAX_SECRET_LEN, Result,
+    hazmat::{
+        bitslice, bitslice_setall, gf256_add, gf256_inv, gf256_mul, unbitslice,
+    },
+};
 
 /// Calculate the lagrange basis coefficients for the lagrange polynomial
 /// defined byt the x coordinates xc at the value x.
@@ -102,10 +105,10 @@ pub fn interpolate<T>(
     xi: &[u8],
     yl: usize,
     yij: &[T],
-    x: u8
+    x: u8,
 ) -> Result<Vec<u8>>
 where
-    T: AsRef<[u8]>
+    T: AsRef<[u8]>,
 {
     // The hazmat gf256 implementation needs the y-coordinate data
     // to be in 32-byte blocks

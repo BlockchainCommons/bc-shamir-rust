@@ -17,7 +17,7 @@
 //! ```toml
 //! [dependencies]
 //! bc-shamir = "0.9.0"
-//!```
+//! ```
 //!
 //! ## Usage
 //!
@@ -31,7 +31,9 @@
 //! let share_count = 3;
 //! let mut random_generator = bc_rand::SecureRandomNumberGenerator;
 //!
-//! let shares = split_secret(threshold, share_count, secret, &mut random_generator).unwrap();
+//! let shares =
+//!     split_secret(threshold, share_count, secret, &mut random_generator)
+//!         .unwrap();
 //!
 //! assert_eq!(shares.len(), share_count);
 //! # }
@@ -44,8 +46,14 @@
 //! # fn main() {
 //! let indexes = vec![0, 2];
 //! let shares = vec![
-//!     vec![47, 165, 102, 232, 218, 99, 6, 94, 39, 6, 253, 215, 12, 88, 64, 32, 105, 40, 222, 146, 93, 197, 48, 129],
-//!     vec![221, 174, 116, 201, 90, 99, 136, 33, 64, 215, 60, 84, 207, 28, 74, 10, 111, 243, 43, 224, 48, 64, 199, 172],
+//!     vec![
+//!         47, 165, 102, 232, 218, 99, 6, 94, 39, 6, 253, 215, 12, 88, 64, 32,
+//!         105, 40, 222, 146, 93, 197, 48, 129,
+//!     ],
+//!     vec![
+//!         221, 174, 116, 201, 90, 99, 136, 33, 64, 215, 60, 84, 207, 28, 74,
+//!         10, 111, 243, 43, 224, 48, 64, 199, 172,
+//!     ],
 //! ];
 //!
 //! let secret = recover_secret(&indexes, &shares).unwrap();
@@ -74,26 +82,21 @@ pub use shamir::{recover_secret, split_secret};
 
 #[cfg(test)]
 mod tests {
-    use super::*;
     use bc_rand::RandomNumberGenerator;
     use hex_literal::hex;
     use rand::{CryptoRng, RngCore};
+
+    use super::*;
 
     #[derive(Debug)]
     struct FakeRandomNumberGenerator;
 
     impl RngCore for FakeRandomNumberGenerator {
-        fn next_u64(&mut self) -> u64 {
-            unimplemented!()
-        }
+        fn next_u64(&mut self) -> u64 { unimplemented!() }
 
-        fn next_u32(&mut self) -> u32 {
-            unimplemented!()
-        }
+        fn next_u32(&mut self) -> u32 { unimplemented!() }
 
-        fn fill_bytes(&mut self, _dest: &mut [u8]) {
-            unimplemented!()
-        }
+        fn fill_bytes(&mut self, _dest: &mut [u8]) { unimplemented!() }
 
         fn try_fill_bytes(
             &mut self,
@@ -129,7 +132,8 @@ mod tests {
         //println!("secret: {}", hex::encode(secret));
         let shares = split_secret(3, 5, &secret, &mut rng).unwrap();
         assert_eq!(shares.len(), 5);
-        //shares.iter().enumerate().for_each(|(index, share)| println!("{}: {}", index, hex::encode(share)));
+        //shares.iter().enumerate().for_each(|(index, share)| println!("{}:
+        // {}", index, hex::encode(share)));
         assert_eq!(shares[0], hex!("00112233445566778899aabbccddeeff"));
         assert_eq!(shares[1], hex!("d43099fe444807c46921a4f33a2a798b"));
         assert_eq!(shares[2], hex!("d9ad4e3bec2e1a7485698823abf05d36"));
@@ -156,7 +160,8 @@ mod tests {
         //println!("secret: {}", hex::encode(secret));
         let shares = split_secret(2, 7, &secret, &mut rng).unwrap();
         assert_eq!(shares.len(), 7);
-        //shares.iter().enumerate().for_each(|(index, share)| println!("{}: {}", index, hex::encode(share)));
+        //shares.iter().enumerate().for_each(|(index, share)| println!("{}:
+        // {}", index, hex::encode(share)));
         assert_eq!(
             shares[0],
             hex!(

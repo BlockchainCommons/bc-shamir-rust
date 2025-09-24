@@ -2,11 +2,7 @@ use bc_crypto::{hash::hmac_sha256, memzero, memzero_vec_vec_u8};
 use bc_rand::RandomNumberGenerator;
 
 use crate::{
-    MAX_SHARE_COUNT,
-    MAX_SECRET_LEN,
-    MIN_SECRET_LEN,
-    Error,
-    Result,
+    Error, MAX_SECRET_LEN, MAX_SHARE_COUNT, MIN_SECRET_LEN, Result,
     interpolate::interpolate,
 };
 
@@ -17,7 +13,11 @@ fn create_digest(random_data: &[u8], shared_secret: &[u8]) -> [u8; 32] {
     hmac_sha256(random_data, shared_secret)
 }
 
-fn validate_parameters(threshold: usize, share_count: usize, secret_length: usize) -> Result<()> {
+fn validate_parameters(
+    threshold: usize,
+    share_count: usize,
+    secret_length: usize,
+) -> Result<()> {
     if share_count > MAX_SHARE_COUNT {
         return Err(Error::TooManyShares);
     } else if threshold < 1 || threshold > share_count {
@@ -42,8 +42,8 @@ fn validate_parameters(threshold: usize, share_count: usize, secret_length: usiz
 /// * `share_count` - The total number of shares to generate. Must be at least
 ///   `threshold` and less than or equal to `MAX_SHARE_COUNT`.
 /// * `secret` - A byte slice containing the secret to be split. Must be at
-///   least `MIN_SECRET_LEN` bytes long and at most `MAX_SECRET_LEN` bytes
-///   long. The length must be an even number.
+///   least `MIN_SECRET_LEN` bytes long and at most `MAX_SECRET_LEN` bytes long.
+///   The length must be an even number.
 /// * `random_generator` - An implementation of the `RandomNumberGenerator`
 ///   trait, used to generate random data.
 ///
@@ -65,7 +65,9 @@ fn validate_parameters(threshold: usize, share_count: usize, secret_length: usiz
 /// let secret = b"my secret belongs to me.";
 /// let mut random_generator = bc_rand::SecureRandomNumberGenerator;
 ///
-/// let shares = split_secret(threshold, share_count, secret, &mut random_generator).unwrap();
+/// let shares =
+///     split_secret(threshold, share_count, secret, &mut random_generator)
+///         .unwrap();
 ///
 /// assert_eq!(shares.len(), share_count);
 /// ```
@@ -73,7 +75,7 @@ pub fn split_secret(
     threshold: usize,
     share_count: usize,
     secret: &[u8],
-    random_generator: &mut impl RandomNumberGenerator
+    random_generator: &mut impl RandomNumberGenerator,
 ) -> Result<Vec<Vec<u8>>> {
     validate_parameters(threshold, share_count, secret.len())?;
 
@@ -90,12 +92,14 @@ pub fn split_secret(
         let mut n = 0;
         let mut result = vec![vec![0u8; secret.len()]; share_count];
 
-        result.iter_mut().enumerate().take(threshold - 2).for_each(|(index, result_item)| {
-            random_generator.fill_random_data(result_item);
-            x[n] = index as u8;
-            y[n].copy_from_slice(result_item);
-            n += 1;
-        });
+        result.iter_mut().enumerate().take(threshold - 2).for_each(
+            |(index, result_item)| {
+                random_generator.fill_random_data(result_item);
+                x[n] = index as u8;
+                y[n].copy_from_slice(result_item);
+                n += 1;
+            },
+        );
 
         // generate secret_length - 4 bytes worth of random data
         let mut digest = vec![0u8; secret.len()];
@@ -111,11 +115,16 @@ pub fn split_secret(
         y[n].copy_from_slice(secret);
         n += 1;
 
-        result.iter_mut().enumerate().take(share_count).skip(threshold - 2).try_for_each(|(index, result_item)| {
-            let v = interpolate(n, &x, secret.len(), &y, index as u8)?;
-            result_item.copy_from_slice(&v);
-            Ok(())
-        })?;
+        result
+            .iter_mut()
+            .enumerate()
+            .take(share_count)
+            .skip(threshold - 2)
+            .try_for_each(|(index, result_item)| {
+                let v = interpolate(n, &x, secret.len(), &y, index as u8)?;
+                result_item.copy_from_slice(&v);
+                Ok(())
+            })?;
 
         // clean up stack
         memzero(&mut digest);
@@ -151,8 +160,14 @@ pub fn split_secret(
 ///
 /// let indexes = vec![0, 2];
 /// let shares = vec![
-///     vec![47, 165, 102, 232, 218, 99, 6, 94, 39, 6, 253, 215, 12, 88, 64, 32, 105, 40, 222, 146, 93, 197, 48, 129],
-///     vec![221, 174, 116, 201, 90, 99, 136, 33, 64, 215, 60, 84, 207, 28, 74, 10, 111, 243, 43, 224, 48, 64, 199, 172],
+///     vec![
+///         47, 165, 102, 232, 218, 99, 6, 94, 39, 6, 253, 215, 12, 88, 64, 32,
+///         105, 40, 222, 146, 93, 197, 48, 129,
+///     ],
+///     vec![
+///         221, 174, 116, 201, 90, 99, 136, 33, 64, 215, 60, 84, 207, 28, 74,
+///         10, 111, 243, 43, 224, 48, 64, 199, 172,
+///     ],
 /// ];
 ///
 /// let secret = recover_secret(&indexes, &shares).unwrap();
@@ -160,7 +175,8 @@ pub fn split_secret(
 /// assert_eq!(secret, b"my secret belongs to me.");
 /// ```
 pub fn recover_secret<T>(indexes: &[usize], shares: &[T]) -> Result<Vec<u8>>
-    where T: AsRef<[u8]>
+where
+    T: AsRef<[u8]>,
 {
     let threshold = shares.len();
     if threshold == 0 || indexes.len() != threshold {
@@ -169,15 +185,30 @@ pub fn recover_secret<T>(indexes: &[usize], shares: &[T]) -> Result<Vec<u8>>
     let share_length = shares[0].as_ref().len();
     validate_parameters(threshold, threshold, share_length)?;
 
-    shares.iter().all(|share| share.as_ref().len() == share_length)
-        .then_some(()).ok_or(Error::SharesUnequalLength)?;
+    shares
+        .iter()
+        .all(|share| share.as_ref().len() == share_length)
+        .then_some(())
+        .ok_or(Error::SharesUnequalLength)?;
 
     if threshold == 1 {
         Ok(shares[0].as_ref().to_vec())
     } else {
         let indexes = indexes.iter().map(|x| *x as u8).collect::<Vec<_>>();
-        let mut digest = interpolate(threshold, &indexes, share_length, shares, DIGEST_INDEX)?;
-        let secret = interpolate(threshold, &indexes, share_length, shares, SECRET_INDEX)?;
+        let mut digest = interpolate(
+            threshold,
+            &indexes,
+            share_length,
+            shares,
+            DIGEST_INDEX,
+        )?;
+        let secret = interpolate(
+            threshold,
+            &indexes,
+            share_length,
+            shares,
+            SECRET_INDEX,
+        )?;
         let mut verify = create_digest(&digest[4..], &secret);
 
         let mut valid = true;
@@ -198,8 +229,9 @@ pub fn recover_secret<T>(indexes: &[usize], shares: &[T]) -> Result<Vec<u8>>
 #[cfg(test)]
 mod tests {
     use bc_rand::SecureRandomNumberGenerator;
-    use crate::recover_secret;
+
     use super::split_secret;
+    use crate::recover_secret;
 
     #[test]
     fn example_split() {
@@ -207,7 +239,9 @@ mod tests {
         let share_count = 3;
         let secret = b"my secret belongs to me.";
         let mut random_generator = SecureRandomNumberGenerator;
-        let shares = split_secret(threshold, share_count, secret, &mut random_generator).unwrap();
+        let shares =
+            split_secret(threshold, share_count, secret, &mut random_generator)
+                .unwrap();
         assert_eq!(shares.len(), share_count);
 
         // Print out the shares, one per line.
@@ -220,8 +254,14 @@ mod tests {
     fn example_recover() {
         let indexes = vec![0, 2];
         let shares = vec![
-            vec![47, 165, 102, 232, 218, 99, 6, 94, 39, 6, 253, 215, 12, 88, 64, 32, 105, 40, 222, 146, 93, 197, 48, 129],
-            vec![221, 174, 116, 201, 90, 99, 136, 33, 64, 215, 60, 84, 207, 28, 74, 10, 111, 243, 43, 224, 48, 64, 199, 172],
+            vec![
+                47, 165, 102, 232, 218, 99, 6, 94, 39, 6, 253, 215, 12, 88, 64,
+                32, 105, 40, 222, 146, 93, 197, 48, 129,
+            ],
+            vec![
+                221, 174, 116, 201, 90, 99, 136, 33, 64, 215, 60, 84, 207, 28,
+                74, 10, 111, 243, 43, 224, 48, 64, 199, 172,
+            ],
         ];
 
         let secret = recover_secret(&indexes, &shares).unwrap();
