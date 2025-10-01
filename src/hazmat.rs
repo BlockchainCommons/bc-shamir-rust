@@ -1,34 +1,40 @@
 use bc_crypto::memzero;
 
-pub fn bitslice(r: &mut [u32; 8], x: &[u8]) {
-    assert!(x.len() >= 32);
+use crate::{Error, Result};
+
+pub fn bitslice(r: &mut [u32; 8], x: &[u8]) -> Result<()> {
+    if x.len() < 32 {
+        return Err(Error::InvalidBufferSize);
+    }
     memzero(r);
     for (arr_idx, cur) in x.iter().enumerate().take(32) {
         let cur = *cur as u32;
         for (bit_idx, r) in r.iter_mut().enumerate() {
-            *r |= ((cur & (1u32.wrapping_shl(bit_idx as u32)))
-                .wrapping_shr(bit_idx as u32))
-            .wrapping_shl(arr_idx as u32);
+            *r |= ((cur & (1u32.wrapping_shl(bit_idx as u32))).wrapping_shr(bit_idx as u32))
+                .wrapping_shl(arr_idx as u32);
         }
     }
+    Ok(())
 }
 
-pub fn unbitslice(r: &mut [u8], x: &[u32; 8]) {
-    assert!(r.len() >= 32);
+pub fn unbitslice(r: &mut [u8], x: &[u32; 8]) -> Result<()> {
+    if r.len() < 32 {
+        return Err(Error::InvalidBufferSize);
+    }
     memzero(r);
     for (bit_idx, cur) in x.iter().enumerate() {
         for (arr_idx, r) in r.iter_mut().take(32).enumerate() {
-            *r |= (((cur & (1u32.wrapping_shl(arr_idx as u32)))
-                .wrapping_shr(arr_idx as u32))
-            .wrapping_shl(bit_idx as u32)) as u8;
+            *r |= (((cur & (1u32.wrapping_shl(arr_idx as u32))).wrapping_shr(arr_idx as u32))
+                .wrapping_shl(bit_idx as u32)) as u8;
         }
     }
+    Ok(())
 }
 
 pub fn bitslice_setall(r: &mut [u32; 8], x: u8) {
     r.iter_mut().enumerate().for_each(|(idx, r)| {
-        *r = (((((x as u32) & (1u32.wrapping_shl(idx as u32)))
-            .wrapping_shl(31 - idx as u32)) as i32)
+        *r = (((((x as u32) & (1u32.wrapping_shl(idx as u32))).wrapping_shl(31 - idx as u32))
+            as i32)
             .wrapping_shr(31)) as u32;
     });
 }

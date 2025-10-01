@@ -25,6 +25,9 @@ pub enum Error {
 
     #[error("shares have unequal length")]
     SharesUnequalLength,
+
+    #[error("invalid buffer size for bitslice operation")]
+    InvalidBufferSize,
 }
 
 pub type Result<T> = std::result::Result<T, Error>;

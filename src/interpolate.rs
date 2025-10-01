@@ -2,9 +2,7 @@ use bc_crypto::{memzero, memzero_vec_vec_u8};
 
 use crate::{
     MAX_SECRET_LEN, Result,
-    hazmat::{
-        bitslice, bitslice_setall, gf256_add, gf256_inv, gf256_mul, unbitslice,
-    },
+    hazmat::{bitslice, bitslice_setall, gf256_add, gf256_inv, gf256_mul, unbitslice},
 };
 
 /// Calculate the lagrange basis coefficients for the lagrange polynomial
@@ -18,7 +16,7 @@ use crate::{
 ///                ---     (x-xc[j])
 ///   values[i] =  | |   -------------
 ///              j != i  (xc[i]-xc[j])
-fn hazmat_lagrange_basis(values: &mut [u8], n: usize, xc: &[u8], x: u8) {
+fn hazmat_lagrange_basis(values: &mut [u8], n: usize, xc: &[u8], x: u8) -> Result<()> {
     // call the contents of xc [ x0 x1 x2 ... xn-1 ]
     let mut xx = [0u8; 32 + 16];
     let mut x_slice = [0u32; 8];
@@ -31,7 +29,7 @@ fn hazmat_lagrange_basis(values: &mut [u8], n: usize, xc: &[u8], x: u8) {
     // xx now contains bitsliced [ x0 x1 x2 ... xn-1 0 0 0 ... ]
     for i in 0..n {
         // lxi = bitsliced [ xi xi+1 xi+2 ... xi-1 0 0 0 ]
-        bitslice(&mut lxi[i], &xx[i..]);
+        bitslice(&mut lxi[i], &xx[i..])?;
         xx[i + n] = xx[i];
     }
 
@@ -76,10 +74,11 @@ fn hazmat_lagrange_basis(values: &mut [u8], n: usize, xc: &[u8], x: u8) {
     // numerator now contains [ l_n_0(x) l_n_1(x) ... l_n_n-1(x) 0 0 0]
     // use the xx array to unpack it
 
-    unbitslice(&mut xx, &numerator);
+    unbitslice(&mut xx, &numerator)?;
 
     // copy results to ouptut array
     values[..n].copy_from_slice(&xx[..n]);
+    Ok(())
 }
 
 /// safely interpolate the polynomial going through
@@ -100,13 +99,7 @@ fn hazmat_lagrange_basis(values: &mut [u8], n: usize, xc: &[u8], x: u8) {
 ///         yij: array of n pointers to arrays of length yl
 ///         x: coordinate to interpolate at
 ///         result: space for yl bytes of interpolate data
-pub fn interpolate<T>(
-    n: usize,
-    xi: &[u8],
-    yl: usize,
-    yij: &[T],
-    x: u8,
-) -> Result<Vec<u8>>
+pub fn interpolate<T>(n: usize, xi: &[u8], yl: usize, yij: &[T], x: u8) -> Result<Vec<u8>>
 where
     T: AsRef<[u8]>,
 {
@@ -126,19 +119,19 @@ where
     let mut result_slice = [0u32; 8];
     let mut temp = [0u32; 8];
 
-    hazmat_lagrange_basis(&mut lagrange, n, xi, x);
+    hazmat_lagrange_basis(&mut lagrange, n, xi, x)?;
 
     bitslice_setall(&mut result_slice, 0);
 
     for i in 0..n {
-        bitslice(&mut y_slice, &y[i]);
+        bitslice(&mut y_slice, &y[i])?;
         bitslice_setall(&mut temp, lagrange[i]);
         let temp2 = temp;
         gf256_mul(&mut temp, &temp2, &y_slice);
         gf256_add(&mut result_slice, &temp);
     }
 
-    unbitslice(&mut values, &result_slice);
+    unbitslice(&mut values, &result_slice)?;
     // the calling code is only expecting yl bytes back
     let mut result = vec![0u8; yl];
     result[..yl].copy_from_slice(&values[..yl]);

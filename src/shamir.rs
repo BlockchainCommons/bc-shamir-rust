@@ -2,8 +2,7 @@ use bc_crypto::{hash::hmac_sha256, memzero, memzero_vec_vec_u8};
 use bc_rand::RandomNumberGenerator;
 
 use crate::{
-    Error, MAX_SECRET_LEN, MAX_SHARE_COUNT, MIN_SECRET_LEN, Result,
-    interpolate::interpolate,
+    Error, MAX_SECRET_LEN, MAX_SHARE_COUNT, MIN_SECRET_LEN, Result, interpolate::interpolate,
 };
 
 const SECRET_INDEX: u8 = 255;
@@ -13,11 +12,7 @@ fn create_digest(random_data: &[u8], shared_secret: &[u8]) -> [u8; 32] {
     hmac_sha256(random_data, shared_secret)
 }
 
-fn validate_parameters(
-    threshold: usize,
-    share_count: usize,
-    secret_length: usize,
-) -> Result<()> {
+fn validate_parameters(threshold: usize, share_count: usize, secret_length: usize) -> Result<()> {
     if share_count > MAX_SHARE_COUNT {
         return Err(Error::TooManyShares);
     } else if threshold < 1 || threshold > share_count {
@@ -92,14 +87,17 @@ pub fn split_secret(
         let mut n = 0;
         let mut result = vec![vec![0u8; secret.len()]; share_count];
 
-        result.iter_mut().enumerate().take(threshold - 2).for_each(
-            |(index, result_item)| {
+        result
+            .iter_mut()
+            .enumerate()
+            .take(threshold - 2)
+            .for_each(|(index, result_item)| {
                 random_generator.fill_random_data(result_item);
+                // Safe cast: index < threshold - 2 < share_count <= MAX_SHARE_COUNT (16) < 256
                 x[n] = index as u8;
                 y[n].copy_from_slice(result_item);
                 n += 1;
-            },
-        );
+            });
 
         // generate secret_length - 4 bytes worth of random data
         let mut digest = vec![0u8; secret.len()];
@@ -121,6 +119,7 @@ pub fn split_secret(
             .take(share_count)
             .skip(threshold - 2)
             .try_for_each(|(index, result_item)| {
+                // Safe cast: index < share_count <= MAX_SHARE_COUNT (16) < 256
                 let v = interpolate(n, &x, secret.len(), &y, index as u8)?;
                 result_item.copy_from_slice(&v);
                 Ok(())
@@ -194,27 +193,19 @@ where
     if threshold == 1 {
         Ok(shares[0].as_ref().to_vec())
     } else {
+        // Safe cast: indexes are validated by validate_parameters to be < MAX_SHARE_COUNT (16) < 256
         let indexes = indexes.iter().map(|x| *x as u8).collect::<Vec<_>>();
-        let mut digest = interpolate(
-            threshold,
-            &indexes,
-            share_length,
-            shares,
-            DIGEST_INDEX,
-        )?;
-        let secret = interpolate(
-            threshold,
-            &indexes,
-            share_length,
-            shares,
-            SECRET_INDEX,
-        )?;
+        let mut digest = interpolate(threshold, &indexes, share_length, shares, DIGEST_INDEX)?;
+        let secret = interpolate(threshold, &indexes, share_length, shares, SECRET_INDEX)?;
         let mut verify = create_digest(&digest[4..], &secret);
 
-        let mut valid = true;
+        // Constant-time comparison to prevent timing attacks
+        let mut diff = 0u8;
         for i in 0..4 {
-            valid &= digest[i] == verify[i];
+            diff |= digest[i] ^ verify[i];
         }
+        let valid = diff == 0;
+
         memzero(&mut digest);
         memzero(&mut verify);
 
@@ -239,9 +230,7 @@ mod tests {
         let share_count = 3;
         let secret = b"my secret belongs to me.";
         let mut random_generator = SecureRandomNumberGenerator;
-        let shares =
-            split_secret(threshold, share_count, secret, &mut random_generator)
-                .unwrap();
+        let shares = split_secret(threshold, share_count, secret, &mut random_generator).unwrap();
         assert_eq!(shares.len(), share_count);
 
         // Print out the shares, one per line.
@@ -255,12 +244,12 @@ mod tests {
         let indexes = vec![0, 2];
         let shares = vec![
             vec![
-                47, 165, 102, 232, 218, 99, 6, 94, 39, 6, 253, 215, 12, 88, 64,
-                32, 105, 40, 222, 146, 93, 197, 48, 129,
+                47, 165, 102, 232, 218, 99, 6, 94, 39, 6, 253, 215, 12, 88, 64, 32, 105, 40, 222,
+                146, 93, 197, 48, 129,
             ],
             vec![
-                221, 174, 116, 201, 90, 99, 136, 33, 64, 215, 60, 84, 207, 28,
-                74, 10, 111, 243, 43, 224, 48, 64, 199, 172,
+                221, 174, 116, 201, 90, 99, 136, 33, 64, 215, 60, 84, 207, 28, 74, 10, 111, 243,
+                43, 224, 48, 64, 199, 172,
             ],
         ];
 
