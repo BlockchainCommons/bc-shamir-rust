@@ -14,10 +14,15 @@ This is a pure-Rust implementation of [Shamir's Secret Sharing (SSS)](https://en
 
 ```toml
 [dependencies]
-bc-shamir = "0.12.0"
+bc-shamir = "0.13.0"
 ```
 
 ## Version History
+
+### 0.13.0 - December 4, 2025
+
+- Align to workspace dependencies (bc-rand 0.5.0, bc-crypto 0.14.0).
+- Update third-party dependencies (hex-literal 1.1.0, rand 0.9.2).
 
 ### 0.12.0 - November 12, 2025
 
